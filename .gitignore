@@ -35,9 +35,5 @@ cert/
 
 # Binaries
 *.bin
-
-src/main/resources/ontology
 *.tar
 *.zip
-
-./src/main/resources/data/dbpedia.tsv
