@@ -123,3 +123,12 @@ The Python application associated with this project is containerized using Docke
 - **Docker:** Version 23. 
 - **docker-compose:** Version 1.29. 
 - **Operating System:** The system should be running Ubuntu 20.04. 
+
+## Ontologies involved in this project
+
+- World Wide Web Consortium: https://www.w3.org/ns/org
+- Friend Of A Friend Ontology http://xmlns.com/foaf/spec/index.rdf
+- Dublin Core Terms; https://www.dublincore.org/resources/glossary/ontology/
+- EUR-Lex European Law Ontology: https://eur-lex.europa.eu/homepage.html
+- The data cube ontology: http://purl.org/linked-data/cube
+- Schema.org Ontology: http://schema.org/
