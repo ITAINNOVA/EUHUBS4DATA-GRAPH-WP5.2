@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block title %} Ontology Tool{% endblock %}
+{% block scripts %}
+
+<script type="text/javascript" src="{{ url_for('static', filename= 'js/match_and_map.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename= 'js/ontology_access.js') }}"></script>
+
+{% endblock %}
+
+{% block content %}
+<div class="container  mt-3">
+    <div class="row ">
+        <div class="col col-9">
+            <!-- 
+            <div class="row">
+                <form id="match_and_map_form">
+                    <div class="mb-3">
+                        <legend for="text-to-graph">Text to graph</legend>
+                        <textarea class="form-control" id="text-to-graph" rows="3"></textarea>
+                    </div>
+                    <button class="btn btn-outline-success" type="submit" id="button-text-to-graph">Process plain
+                        text</button>
+                </form>
+            </div>
+            -->
+            <div class="row">
+                
+                <form id="map_metadata_form">
+                    <div class="mb-3">
+                        <legend for="text-to-graph">Map metadata</legend>
+                    </div>
+                    <div class="mb-3">
+                        <button class="btn btn-outline-success" type="submit" id="button-metadata-process">Update datasets</button>
+                    </div>
+
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+
+</div>
+
+{% endblock %}
+
+{% block underfooter %}
+<div id="popup" style="display: none;">
+    <div class="content-popup border border-dark">
+            <div id="mapping_id_element"> </div>
+                <div class="card" style="width: 18rem;">
+                    <ul class="list-group list-group-flush" id="list_color_popup">
+                    </ul>
+                    <div id="popup-container-id">
+                        <div class="overlay"></div>
+                    </div>
+                </div>
+
+                
+    </div>
+</div>
+
+{% endblock %}

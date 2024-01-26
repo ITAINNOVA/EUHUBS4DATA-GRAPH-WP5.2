@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %} Ontology Tool{% endblock %}
+{% block scripts %}
+<script type="text/javascript" src="{{ url_for('static', filename= 'js/ontology_access.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename= 'js/search_nodes.js') }}"></script>
+
+
+{% endblock %}
+{% block content %}
+
+<div class="row my-2">
+    <div class="col">
+        <form class="d-flex" id="search-id-form-advanced">
+                <div class="col-8">
+                        <input class="form-control me-2" type="search" placeholder="Search class" aria-label="Search" id="search-dataset-id">
+
+                </div>
+                <div class="col-2">
+                        <button class="btn btn-outline-success" type="submit">Search</button>
+                </div>
+                <div class="col-2">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Quantity</span>
+                        <input type="text" class="form-control" value="1" aria-label="Quantity"
+                            id="id-size-nodes-to-search">
+                        <span class="form-text">
+                            Min value 1, max value 50
+                        </span>
+                    </div>
+                </div>
+        </form>
+    </div>
+</div>
+
+
+
+<!--- https://stackoverflow.com/questions/44349904/bootstrap-4-show-element-only-when-nav-tab-is-active --->
+
+
+{% endblock %}

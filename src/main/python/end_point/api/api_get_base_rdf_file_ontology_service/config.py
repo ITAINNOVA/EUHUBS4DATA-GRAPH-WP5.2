@@ -1,0 +1,1 @@
+RETURN_BASE_ONTOLGY_DESC="Operations relation to the retrieving of the project's main ontology"

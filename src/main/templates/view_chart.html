@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block title %} Ontology Tool{% endblock %}
+{% block scripts %}
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.21.0/dist/bootstrap-table.min.css">
+<script src="https://unpkg.com/bootstrap-table@1.21.0/dist/bootstrap-table.min.js"></script>
+<script type="text/javascript" src="{{ url_for('static', filename= 'js/radar_metric_chart.js') }}"></script>
+
+<style id="" media="all">
+    @font-face {
+        font-family: 'Cabin';
+        font-style: normal;
+        font-weight: 400;
+        font-stretch: normal;
+        font-display: swap;
+        src: url(/fonts.gstatic.com/s/cabin/v26/u-4X0qWljRw-PfU81xCKCpdpbgZJl6XFpfEd7eA9BIxxkV2EH7alwg.ttf) format('truetype');
+    }
+
+    @font-face {
+        font-family: 'Cabin';
+        font-style: normal;
+        font-weight: 700;
+        font-stretch: normal;
+        font-display: swap;
+        src: url(/fonts.gstatic.com/s/cabin/v26/u-4X0qWljRw-PfU81xCKCpdpbgZJl6XFpfEd7eA9BIxxkbqDH7alwg.ttf) format('truetype');
+    }
+</style>
+<style id="" media="all">
+    @font-face {
+        font-family: 'Montserrat';
+        font-style: normal;
+        font-weight: 900;
+        font-display: swap;
+        src: url(/fonts.gstatic.com/s/montserrat/v25/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCvC73w5aX8.ttf) format('truetype');
+    }
+</style>
+
+{% endblock %}
+{% block content %}
+
+<div class="row my-2">
+    <div class="py-2 col">
+        <h1>IDS ontology OQuare metrics</h1>
+        <div id="id_metrics_container" class="container">
+
+            <div style="margin-top:5px" class="py-3 container">
+                <canvas id="my_Chart_radar" style="width:100%;max-width:700px"></canvas>
+            
+            </div>
+            <div style="margin-top:5px" class="py-3 container">
+                <canvas id="my_Chart_bar" style="width:100%;max-width:700px"></canvas>
+            
+            </div>
+            <div id="id_quore_values" style="margin-top:5px" class="py-3 container">
+                <h2>OQuare values</h2>
+            </div>
+
+            <div id="id_quore_scores" style="margin-top:5px" class="py-3 container">
+                <h2>OQuare scores</h2>
+            </div>
+
+            <div id="id_structural" style="margin-top:5px" class="py-3 container">
+                <h2>Structural</h2>
+            </div>
+
+            <div id="id_operability" style="margin-top:5px" class="py-3 container">
+                <h2>Operability</h2>
+            </div>
+
+            <div id="id_reliability" style="margin-top:5px" class="py-3 container">
+                <h2>Reliability</h2>
+            </div>
+
+            <div id="id_transferability" style="margin-top:5px" class="py-3 container">
+                <h2>Transferability</h2>
+            </div>
+
+            <div id="id_adequacy" style="margin-top:5px" class="py-3 container">
+
+                <h2> Functional adequacy</h2>
+            </div>
+
+            <div id="id_maintainability" style="margin-top:5px" class="py-3 container">
+                <h2>Maintainability</h2>
+            </div>
+
+            <div id="id_compatibility" style="margin-top:5px" class="py-3 container">
+                <h2>Compatibility</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

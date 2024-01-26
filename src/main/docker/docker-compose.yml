@@ -1,0 +1,157 @@
+version: "3"
+services:
+
+##########################################################################
+#####
+#####
+##### NGINX SERVER
+#####
+##########################################################################
+  nginx_proxy:
+    container_name: nginx_proxy
+    build:
+      context: ./
+      dockerfile: ./src/main/docker/python/nginx.dockerfile
+    image: ontology_nginx_proxy
+    volumes:
+      - /certificates/itainnova.es/:/etc/itainnova.es/
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    logging: &logging
+      driver: journald
+      options:
+        tag: "{{.ImageName}}/{{.Name}}"
+    depends_on:
+      - elastic-search
+    networks:
+      - net_euhubsdata
+    command: "/bin/sh -c 'while :; do sleep 24h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "https://nginx_proxy/health/" ]
+      interval: 1m30s
+      timeout: 5s
+      retries: 3
+      start_period: 2s
+
+##########################################################################
+#####
+#####
+##### BROWSER ENGINE
+#####
+##########################################################################
+  elastic-search:
+    image: elasticsearch:7.16.3
+    container_name: elastic-search
+    restart: always
+    ports:
+      - "${ELASTICH_SEARCH_PORT}:${ELASTICH_SEARCH_PORT}"
+    environment:
+      - node.name=elastic-search
+      - cluster.name=elastic-search-cluster
+      - discovery.type=single-node
+      - bootstrap.memory_lock=false
+      - "ES_JAVA_OPTS=-Xms4g -Xmx4g"
+      - xpack.security.enabled=true
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - logger.level=WARN
+      - cluster.routing.allocation.disk.watermark.low=5gb
+      - cluster.routing.allocation.disk.watermark.high=3gb
+      - cluster.routing.allocation.disk.watermark.flood_stage=1gb
+      - ingest.geoip.downloader.enabled=false
+    volumes:
+      - src_esdata01:/usr/share/elasticsearch/data:rw
+    networks:
+      - net_euhubsdata
+
+##########################################################################
+#####
+#####
+##### DATABASE
+#####
+##########################################################################
+  neo4j-db:
+    image: neo4j:4.4.3
+    container_name: neo4j-db
+    restart: always
+    ports:
+      - "${NEO4J_DB_HTTP_PORT}:${NEO4J_DB_HTTP_PORT}"
+      - "${NEO4J_DB_PORT}:${NEO4J_DB_PORT}"
+    environment:
+      - NEO4J_AUTH=${NEO4J_USER}/${NEO4J_PASS}
+      - NEO4J_HOME=/var/lib/neo4j
+      - NEO4J_dbms_allow__upgrade=true
+      - NEO4J_dbms_security_procedures_allowlist=apoc.coll.*,apoc.load.*,n10s.*
+      - NEO4J_dbms_unmanaged__extension__classes=n10s.endpoint=/rdf
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*,n10s.*
+      - NEO4J_apoc_export_file_enabled=true
+      - NEO4J_apoc_import_file_enabled=true
+      - NEO4J_apoc_import_file_use__neo4j__config=true
+    volumes:
+      - ~/neo4j/data:/data
+      - ~/neo4j/import:/import
+      - ~/neo4j/plugins:/plugins
+    networks:
+      - net_euhubsdata
+
+##########################################################################
+#####
+#####
+##### APPLICATION
+#####
+##########################################################################
+  ontology_application_tool:
+    build:
+      context: ./ 
+      dockerfile: ./src/main/docker/python/application.dockerfile
+    container_name: ontology_application_tool
+    image: ontology_application_tool
+    depends_on:
+      - neo4j-db
+      - elastic-search 
+    volumes:
+      - ./src/main/resources:/root/resources:rw
+      - src_models_huggingface:/root/.cache/huggingface:rw
+    command:  python3 main.py
+    environment:
+      - DB_DATABASE=neo4j-db
+      - DB_PASS=${NEO4J_PASS}
+      - DB_USER=${NEO4J_USER}
+      - HOST_NAME=ontology_application_tool
+      - ELSE_HOST=elastic-search
+      - FLASK_APP_PORT=${FLASK_APP_PORT}
+      - ELASTICH_SEARCH_PORT=${ELASTICH_SEARCH_PORT}
+      - NEO4J_DB_PORT=${NEO4J_DB_PORT}
+      - CKAN_HOST=${CKAN_HOST}
+      - CKAN_API_KEY=${CKAN_API_KEY}
+      - ELASTIC_USER=${ELASTIC_USER}
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - NEO4J_DB_HTTP_PORT=${NEO4J_DB_HTTP_PORT}
+      - TZ=Europe/Madrid
+      - LOGLEVEL=DEBUG
+    links:
+      - neo4j-db
+      - elastic-search
+    restart: always
+    networks:
+      - net_euhubsdata
+
+##########################################################################
+#####
+#####
+##### NETWORK AND VOLUMES
+#####
+##########################################################################
+networks:
+  net_euhubsdata:
+    ipam:
+      driver: default
+      config:
+        - subnet: "10.5.0.0/16"
+
+volumes:
+  src_esdata01:
+    external: true
+  src_models_huggingface:
+    driver: local

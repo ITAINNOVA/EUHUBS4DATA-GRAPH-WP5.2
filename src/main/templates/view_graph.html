@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %} Ontology Tool{% endblock %}
+{% block scripts %}
+<script type="text/javascript" src="{{ url_for('static', filename= 'js/search_graphs.js') }}"></script>
+
+{% endblock %}
+
+{% block body %}
+<div class="col">
+    <div class="row my-2">
+        <div class="col-10 justify-content-center align-items-center">
+            <center>
+                <div class="d-flex justify-content-center">
+                    <div class="row my-2">
+                        <div class="fs-4">
+                            <!--src/main/python/app/static/img/GrafoConocimientoActualizado.PNG-->
+                            <img src="{{ url_for('static', filename= 'img/GrafoConocimientoActualizado.PNG') }}"
+                                class="img-fluid mx-auto">
+                            <p class="fw-normal">
+                                In order to visualize the graph's datasets please access through the following link
+                                <a href="https://euh4d-data-portal.vm.fedcloud.eu/" class="text-reset">EUHubs4Data
+                                    CKAN</a>
+                                .
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </center>
+        </div>
+    </div>
+    <div class="row my-2">
+        <center>
+            <div class="d-flex justify-content-center">
+                <!--src/main/python/app/static/img/idsextrainfo.PNG-->
+                <div class="row my-2">
+                    <p class="fs-4"> So as to get to the dataset's relationships check the key <i>idsExtraInfo</i>:
+                    </p>
+                    <img src="{{ url_for('static', filename= 'img/idsextrainfo.PNG') }}"
+                        class="rounded mx-auto d-block">
+                </div>
+            </div>
+        </center>
+    </div>
+</div>
+
+{% endblock %}
+
+
+<!-- src/main/python/app/static/img/database-graph-image.png-->
+
+
+<!--- https://stackoverflow.com/questions/44349904/bootstrap-4-show-element-only-when-nav-tab-is-active --->

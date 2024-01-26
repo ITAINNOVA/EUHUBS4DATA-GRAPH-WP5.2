@@ -1,0 +1,1 @@
+DATABASE_GRAPH_SERVICE_DESC_JOB="Returns the nodes in the Neo4j graph format"

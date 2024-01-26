@@ -1,0 +1,43 @@
+# Editors #
+###########
+.vscode/
+.idea/
+.env
+
+# Resources #
+#############
+#resources/
+#data/
+tmp/
+# Logs and databases #
+######################
+log/
+logs/
+*.log
+log.txt
+log_twitter.txt
+#*.sql
+*.sqlite
+*.ipynb
+*.tar.gz
+
+# FROM https://github.com/github/gitignore/blob/master/Python.gitignore
+# Byte-compiled / optimized / DLL files #
+#########################################
+__pycache__/
+*.py[cod]
+*$py.class
+src/main/nb/*
+src/main/nb/.ipynb_checkpoints/*
+
+# Virtual environment
+cert/
+
+# Binaries
+*.bin
+
+src/main/resources/ontology
+*.tar
+*.zip
+
+./src/main/resources/data/dbpedia.tsv
