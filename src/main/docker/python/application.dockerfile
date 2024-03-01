@@ -49,12 +49,14 @@ RUN mkdir ${APP_ROOT}nltk_data/corpora/wordnet_spa
 RUN unzip ${APP_ROOT}nltk_data/corpora/wordnet.zip -d ${APP_ROOT}nltk_data/corpora
 ADD ./src/main/resources/data/wordnet_spa.tar.gz ${APP_ROOT}nltk_data/corpora/wordnet_spa
 
-COPY ./src/main/python/ ${APP_ROOT}
+COPY ./src/main/python/requirements.txt ${APP_ROOT}requirements.txt
 COPY ./src/main/java/ ${APP_ROOT}java/
 COPY ./src/main/templates/ ${APP_ROOT}templates/
 COPY ./src/main/static/ ${APP_ROOT}static/
 
-RUN pip3 install https://github.com/overhangio/py2neo/releases/download/2021.2.3/py2neo-2021.2.3.tar.gz
 RUN pip3 install -r ${APP_ROOT}requirements.txt
+RUN pip3 install https://github.com/overhangio/py2neo/releases/download/2021.2.3/py2neo-2021.2.3.tar.gz
+
+COPY ./src/main/python/ ${APP_ROOT}
 
 CMD ["/usr/bin/python3.8"]

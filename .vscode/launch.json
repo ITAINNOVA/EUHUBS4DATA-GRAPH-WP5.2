@@ -1,0 +1,15 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Uvicorn websocket_server:app",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/main/python/main.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/src",
+            "justMyCode": true,
+            "envFile": "${workspaceFolder}/src/main/docker/.env"
+        }
+    ]
+}

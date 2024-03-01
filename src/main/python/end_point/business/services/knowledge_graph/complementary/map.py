@@ -412,57 +412,6 @@ class Map:
         
         return prediction_class
 
-    def map_just_one_concept_to_node(self, primary_node, query, search_index_class, special_relation, main_ontology, language='en'):
-        """
-        Maps just one concept to a node in the ontology.
-
-        Args:
-            primary_node (str): The URI of the primary node.
-            query (str): The query to search for.
-            search_index_class (SearchIndexClass): The search index class.
-            special_relation (str): The special relation to add between the primary node and the concept node.
-            main_ontology (MainOntology): The main ontology.
-            language (str, optional): The language for the query. Defaults to 'en'.
-
-        Returns:
-            str: The URI of the concept node.
-        """
-        head_instance_uri = None
-        populate_list = list()
-        try:
-            # Log the query
-            application_logger.warning(query)
-
-            # Search for the instance and class for the query
-            head_prediction_class, head_instance_uri, populating_ontology = self.search_instance_and_class_for_query(
-                query, search_index_class, language)
-
-            if head_instance_uri:
-                # Add a new triplet between the primary node and the concept node
-                main_ontology.add_new_triplet(
-                    URIRef(primary_node), URIRef(special_relation), URIRef(head_instance_uri))
-
-                # Create content for populating the concept node
-                populate_list = self.create_content_for_populating(
-                    head_instance_uri, query, populate_list)
-
-                # Update the search index with the populated content
-                search_index_class.update_elastic_search_index_consulting(
-                    populate_list)
-        except Exception as e:
-            error_message=f"""
-            Error while mapping just one concept to node.
-            primary_node: {str(primary_node)}
-            query: {str(query)}
-            search_index_class: {str(search_index_class)}
-            special_relation: {str(special_relation)}
-            language: {str(language)}
-            Error: {str(e)}
-            """
-            application_logger.error(error_message)
-            application_logger.error(e, exc_info=True)
-
-        return head_instance_uri
 
     def semantic_analyse_class_results(self, list_classes, query, language):
         """
@@ -530,10 +479,7 @@ class Map:
                 cache_prediction_class = db_cache.get_class_of_prediction(
                     query)
                 if not cache_prediction_class:
-                    application_logger.info(
-                        f"Let's find this query in the index {str(query)}")
-
-                    # search_in_index_es_dbpedia
+                    application_logger.info(f"Let's find this query in the index {str(query)}")
                     if language == 'es':
                         list_prediction_class = search_index_class.search_in_index_es_dbpedia(
                             query)

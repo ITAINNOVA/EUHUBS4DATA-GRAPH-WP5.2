@@ -320,7 +320,6 @@ class DACTAccess(OntologyAccess):
                             else:
                                 application_logger.info(f"Adding Data... -> {str(key)}: {str(value)}")
                                 # Check if the property is a property which have to be imported as a node
-                                # special_property_insert(self, name_property, value, individual_uri,matchandmap=None)
                                 bool_created_property = False
                                 if self.dict_special_properties.get(key):
                                     self.special_values_map[key] = value
@@ -434,6 +433,59 @@ class DACTAccess(OntologyAccess):
         new_uri_list_result = self.mapping_metadata_to_class(
             [value], class_range_str,  property_query, uri_token=True, individual_uri=auxiliar_uri, matchandmap=matchandmap, search_index=search_index)
         return uri_list + new_uri_list_result
+    
+    def map_just_one_concept_to_node(self, primary_node, query, search_index_class, special_relation, matchandmap, language='en'):
+        """
+        Maps just one concept to a node in the ontology graph.
+
+        Args:
+        - primary_node: The URI of the primary node to map the concept to.
+        - query: The concept query to be mapped.
+        - search_index_class: The search index class for querying the ontology graph.
+        - special_relation: The special relation to be added between the primary node and the concept node.
+        - matchandmap: The match and map instance for searching and mapping the concept.
+        - language: The language for the query (default is 'en').
+
+        Returns:
+        - head_instance_uri: The URI of the mapped concept instance.
+        - head_prediction_class: The class of the mapped concept instance.
+        """
+        head_instance_uri = None  # Initialize head_instance_uri
+        populate_list = list()  # Initialize populate_list
+
+        try:
+            # Search for the instance and class for the query
+            matchandmap.map.main_ontology = self
+            head_prediction_class, head_instance_uri, populating_ontology = matchandmap.map.search_instance_and_class_for_query(query, search_index_class, language)
+
+            if head_instance_uri:
+                # Add a new triplet between the primary node and the concept node
+                self.add_new_triplet(URIRef(primary_node), URIRef(special_relation), URIRef(head_instance_uri))
+
+                # Create content for populating the concept node
+                populate_list = matchandmap.map.create_content_for_populating(
+                    head_instance_uri, query, populate_list)
+
+                # Update the search index with the populated content
+                search_index_class.update_elastic_search_index_consulting(
+                    populate_list)
+        except Exception as e:
+            # Log the error message and details
+            error_message=f"""
+            Error while mapping just one concept to node.
+            primary_node: {str(primary_node)}
+            query: {str(query)}
+            search_index_class: {str(search_index_class)}
+            special_relation: {str(special_relation)}
+            language: {str(language)}
+            Error: {str(e)}
+            """
+            application_logger.error(error_message)
+            application_logger.error(e, exc_info=True)
+
+        return head_instance_uri, head_prediction_class  # Return the mapped concept instance URI and class
+    
+
 
     def special_property_insert(self, name_property, value, individual_uri, search_index_class, matchandmap=None):
         """
@@ -447,26 +499,39 @@ class DACTAccess(OntologyAccess):
             matchandmap (MatchAndMap, optional): The MatchAndMap instance to use. Defaults to None.
         """
         try:
-            class_node, relationship_node = self.dict_special_properties.get(
-                name_property)
+            class_node, relationship_node = self.dict_special_properties.get(name_property)
 
             # If "domains" is in the name of the property
             if "domains" in name_property:
+                application_logger.warning(f"Domains property: Value: {str(value)}")
                 value_list = utils.prepare_and_parse_ckan(value)
-                for value in value_list:
-                    application_logger.info(f"Attempting to import {value}")
-                    matchandmap.map.map_just_one_concept_to_node(
-                        individual_uri, value.strip().capitalize(), search_index_class, relationship_node, self)
+                application_logger.warning(f"Domains property: Value List: {str(value_list)}")
 
+                for sub_value in value_list:
+                    sub_value = str(sub_value).strip().capitalize()
+                    application_logger.warning(f"Domains property: Attempting to import {sub_value}: Relationship: {str(relationship_node)}")
+                    head_instance_uri, class_node = self.map_just_one_concept_to_node(individual_uri, sub_value, search_index_class, relationship_node, matchandmap)
+                    application_logger.warning(f"Subvalue: {str(value)}, Relationship: {str(relationship_node)} Class: {str(class_node)} Individual: {str(individual_uri)}")
+                    self.create_property(
+                        sub_value, class_node, individual_uri, relationship_node, matchandmap)
+            else:
             # If there is a semicolon in the value
-            if ";" in value:
-                value_list = utils.prepare_and_parse_ckan(value)
-                for value in value_list:
+                application_logger.warning(f"Before creating property: {str(name_property)} Value: {str(value)}")
+
+                if ";" in value:
+                    value_list = utils.prepare_and_parse_ckan(value)
+                    application_logger.warning(f"Value List: {str(value_list)}")
+                    for sub_value in value_list:
+                        sub_value = str(sub_value).strip().capitalize()
+                        application_logger.warning(f"Subvalue: {str(sub_value)}, Relationship: {str(relationship_node)} Class: {str(class_node)} Individual: {str(individual_uri)}")
+                        self.create_property(
+                            sub_value, class_node, individual_uri, relationship_node, matchandmap)
+                else:
+                    application_logger.warning(f"Value: {str(value)}, Relationship: {str(relationship_node)} Class: {str(class_node)} Individual: {str(individual_uri)}")
                     self.create_property(
                         value.strip(), class_node, individual_uri, relationship_node, matchandmap)
-            else:
-                self.create_property(
-                    value.strip(), class_node, individual_uri, relationship_node, matchandmap)
+                
+            application_logger.warning("---------------------------------------------------------")
         except Exception as e:
             application_logger.error("Error while mapping specials properties")
             application_logger.error(f"{str(name_property)} <-> {str(value)}")

@@ -1100,6 +1100,26 @@ class OntologyAccess:
             application_logger.error("Error in function (__merge_with_main_ontology)")
             application_logger.error(e, exc_info=True)
 
+    def drop_duplicates(self, graph):
+        # Removing duplicates by leveraging the fact that a set contains only unique items
+        # Explicitly extract triples from the graph to ensure uniqueness
+        try:
+            unique_triples = set(graph.triples((None, None, None)))
+
+            # Create a new graph
+            g_clean = Graph()
+
+            # Add the unique triples back to the clean graph
+            for triple in unique_triples:
+                g_clean.add(triple)
+
+        except Exception as ex:
+            g_clean = graph
+            application_logger.error(f"Exception caught while dropping duplicates: {str(ex)}")
+            application_logger.error(ex, exc_info=True)
+        
+        return g_clean
+
     def __save_graph_database(self, graph, basename, bool_import=False):
         """
         Save the graph database to a file and optionally import it to the remote database.
@@ -1110,6 +1130,7 @@ class OntologyAccess:
             bool_import (bool, optional): Whether to import the file to the remote database. Defaults to False.
         """
         try:
+            graph = self.drop_duplicates(graph)
             # Build the file path and filename
             file_path, filename = utils.build_filename(
                 basename, self.base_resource_path)
